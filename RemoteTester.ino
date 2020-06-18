@@ -8,7 +8,6 @@
 // Note: GPIO 16 won't work on the ESP8266 as it does not have interrupts.
 const uint16_t kRecvPin = 2;
 
-const int IR_rec_pin = 2;             // IR 接收器輸出腳位
 int IRstate = LOW;                    // IR 接收器輸出腳位狀態
 int IRstate_last = LOW;               // IR 接收器輸出腳位狀態(上一次)
 unsigned long int time_last = 0;      // 上一次 IRstate 變化的時間
@@ -41,6 +40,12 @@ void printCode(decode_results codes) {
     Serial.println();
 }
 
+inline bool time_approx_eq(int32_t a, int32_t b)
+{
+    int32_t diff = a - b;
+    return (abs(diff) < 300);
+}
+
 void IR_rec_Check(){
     IRstate = digitalRead(kRecvPin);        // 讀取腳位狀態
     if (IRstate != IRstate_last) {          //
@@ -49,23 +54,41 @@ void IR_rec_Check(){
 
         if( (dT >= durationMax) && !isIdle ) {     // 時間間隔大於設定的時間，且原本的狀態為接收中狀態
             isIdle = true; //進入等待狀態
-            Serial.println( "Idling...\n" );
+            Serial.println();
         } else if ((dT < durationMax) && (dT > durationMin)) {
             isIdle = false; //進入接收中狀態
             /*
-            if (IRstate == HIGH) Serial.print(dT);
-            else Serial.print( 0-dT );
+            if (IRstate == HIGH) {
+                Serial.print(dT);
+                Serial.print(" ");
+            } else {
+                Serial.print( 0-dT );
+                Serial.println();
+            }
             */
+            
             if (IRstate == LOW) {
-                if (dT > 2000) {
+                if (time_approx_eq(dT, 2250)) {
                     Serial.print(">");
-                } else if (dT > 800 && dT <= 2000) {
+                } else if (time_approx_eq(dT, 1675)) {
                     Serial.print("1");
-                } else {
+                } else if (time_approx_eq(dT, 450)) {
                     Serial.print(".");
+                } else if (time_approx_eq(dT, 8340)) {
+                    Serial.print("E");
+                } else {
+                    Serial.print("?");
+                }
+            } else {
+                if (time_approx_eq(dT, 3750)) {
+                    Serial.print("^");
+                } else if (time_approx_eq(dT, 750)) {
+                    ;
+                } else {
+                    Serial.print("+");
                 }
             }
-            //Serial.print(" ");
+            
         }
         // 記錄此次時間
         time_last = timeNow;
