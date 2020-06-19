@@ -7,11 +7,11 @@
 When each button is pressed, the remoter would send a sequence of IR signals.  
 Here we use following symbols to represent the IR signals.
 
-- `^`: HIGH for 3750us, used in start codes
-- `>`: LOW for 2250us, used in start codes
-- `0`: HIGH for 750us then LOW for 450us, represent bit '0'
-- `1`: HIGH for 750us then LOW for 1675us, represent bit '1'
-- `E`: LOW for 8340us, used to separate two parts
+- `^`: HIGH for 3850us, used in start codes
+- `>`: LOW for 2175us, used in start codes
+- `0`: HIGH for 850us then LOW for 375us, represent bit '0'
+- `1`: HIGH for 850us then LOW for 1600us, represent bit '1'
+- `E`: HIGH for 850us then LOW for 8340us, used to separate two parts
 
 Each sequence of signals would be th e following format:
 ```
